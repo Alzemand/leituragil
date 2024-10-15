@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitura de Texto</title>
+    <link href="src\bootstrap-5.3.3-dist\css\bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="src\bootstrap-icons-1.11.3\font\bootstrap-icons.css">
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #darkModeToggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        #display {
+            font-size: 4rem;
+            display: none;
+            text-align: center;
+            margin-top: 20vh;
+        }
+        #control-panel {
+            display: none;
+        }
+        #textDisplay {
+            text-align: center;
+            padding: 20px;
+        }
+        .word {
+            color: gray;
+            cursor: pointer;
+        }
+        .word.selected {
+            color: black;
+        }
+        body.bg-dark .word.selected {
+            color: white;
+        }
+        #wordFullscreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            background-color: inherit;
+            color: inherit;
+        }
+        #wordDisplay {
+            font-size: 12vw; /* Tamanho da fonte responsivo */
+            text-align: center;
+            word-break: break-word; /* Quebra de palavra */
+        }
+        #closeWordFullscreen {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="container">
+    <button id="darkModeToggle" class="btn btn-outline-secondary" title="Alternar Modo Escuro">
+        <i class="bi bi-sun" id="sunIcon"></i>
+        <i class="bi bi-moon" id="moonIcon" style="display: none;"></i>
+    </button>
+    <div class="mt-5">
+        <h1 class="text-center mb-5">Leitura Ágil</h1>
+        <div class="form-group">
+            <label for="textInput">Digite seu texto:</label>
+            <textarea class="form-control" id="textInput" rows="5" placeholder="Digite seu texto aqui..."></textarea>
+        </div>
+        <div class="form-group mt-2">
+            <label for="speedSelect">Escolha a velocidade de leitura (palavras por minuto):</label>
+            <select class="form-select" id="speedSelect">
+                <option value="300">300</option>
+                <option value="400">400</option>
+                <option value="500">500</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row align-items-center mt-3 mb-5">
+        <div class="col-6">
+            <button class="btn btn-outline-primary" onclick="prepareReading()">Configurar Leitura</button>
+        </div>
+        <div class="col-6 text-end">
+            <div id="control-panel">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-success ml-1" onclick="playReading()" title="Play">
+                        <i class="bi bi-play-fill"></i>
+                    </button>
+
+                    <button class="btn btn-outline-danger ml-1" onclick="clearTextArea()" title="Pause">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+
+                    <button class="btn btn-outline-secondary ml-1" onclick="previousWord()" title="Anterior">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary ml-1" onclick="nextWord()" title="Próxima">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5"><h6 id="titulo_app" class="text-center"></h6></div>
+    <div class="mt-3" id="textDisplay" style="text-align: justify;"></div>
+
+    <div id="wordFullscreen" style="display: none;">
+        <div class="row">
+            <div class="col-12 text-center">
+                <span id="wordDisplay"></span>
+            </div>
+        </div>
+        <span id="closeWordFullscreen" onclick="closeWordFullscreen()">× Fechar</span>
+    </div>
+
+    <script>
+        let textArray = [];
+        let currentWordIndex = 0;
+        let intervalId;
+        let speed = 300;
+
+        function prepareReading() {
+            const textInput = document.getElementById('textInput').value;
+            textArray = textInput.split(/\s+/);
+            speed = parseInt(document.getElementById('speedSelect').value);
+            currentWordIndex = 0;
+            renderTextDisplay();
+            document.getElementById('control-panel').style.display = 'block';
+            document.getElementById('titulo_app').textContent = `Leitura em ${speed} palavras por minuto`;
+        }
+
+        function renderTextDisplay() {
+            const textDisplay = document.getElementById('textDisplay');
+            textDisplay.innerHTML = '';
+            textArray.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.classList.add('word');
+                if (index === currentWordIndex) {
+                    span.classList.add('selected');
+                }
+                span.textContent = word + ' ';
+                span.onclick = () => {
+                    setWordIndex(index);
+                };
+                textDisplay.appendChild(span);
+            });
+        }
+
+        function setWordIndex(index) {
+            currentWordIndex = index;
+            renderTextDisplay();
+        }
+
+        function playReading() {
+            if (intervalId) clearInterval(intervalId);
+            showWordFullscreen();
+        }
+
+        function pauseReading() {
+            clearInterval(intervalId);
+            exitFullscreen();
+        }
+
+        function previousWord() {
+            if (currentWordIndex > 0) currentWordIndex--;
+            renderTextDisplay();
+        }
+
+        function nextWord() {
+            if (currentWordIndex < textArray.length - 1) currentWordIndex++;
+            renderTextDisplay();
+        }
+
+        function showWordFullscreen() {
+            document.getElementById('wordFullscreen').style.display = 'flex';
+            displayWord();
+            intervalId = setInterval(() => {
+                if (currentWordIndex < textArray.length) {
+                    displayWord();
+                    currentWordIndex++;
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 60000 / speed);
+        }
+
+        function displayWord() {
+            const wordDisplay = document.getElementById('wordDisplay');
+            if (currentWordIndex < textArray.length) {
+                wordDisplay.textContent = textArray[currentWordIndex];
+            }
+        }
+
+        function closeWordFullscreen() {
+            clearInterval(intervalId);
+            document.getElementById('wordFullscreen').style.display = 'none';
+            renderTextDisplay();
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('bg-dark');
+            document.body.classList.toggle('text-white');
+            const textarea = document.getElementById('textInput');
+            const select = document.getElementById('speedSelect');
+            textarea.classList.toggle('bg-dark');
+            textarea.classList.toggle('text-white');
+            textarea.classList.toggle('border-light');
+            select.classList.toggle('bg-dark');
+            select.classList.toggle('text-white');
+            select.classList.toggle('border-light');
+
+            const sunIcon = document.getElementById('sunIcon');
+            const moonIcon = document.getElementById('moonIcon');
+            sunIcon.style.display = sunIcon.style.display === 'none' ? 'block' : 'none';
+            moonIcon.style.display = moonIcon.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function clearTextArea() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('control-panel').style.display = 'none';
+            document.getElementById('textDisplay').innerHTML = '';
+            document.getElementById('titulo_app').textContent = '';
+        }
+        
+
+        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+    </script>
+</body>
+</html>
