@@ -2,6 +2,8 @@ Leiturágil
 
 # Leiturágil
 
+
+
 Transforme a maneira como você lê! O Leiturágil é um aplicativo inovador que permite que você absorva textos de forma eficiente, ajudando a aumentar sua velocidade de leitura e melhorar sua compreensão.
 
 ## Principais Recursos
@@ -18,3 +20,4 @@ Transforme a maneira como você lê! O Leiturágil é um aplicativo inovador que
 
 Se você é estudante, profissional ou apenas alguém que deseja ler mais e mais rápido, o Leiturágil é a ferramenta perfeita para você. Aprenda a absorver informações de forma mais eficaz e torne a leitura uma parte ainda mais gratificante do seu dia a dia.
 
+Testar: https://alzemand.com/leituragil/
