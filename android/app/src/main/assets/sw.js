@@ -1,6 +1,6 @@
 // Service worker do Leiturágil: guarda os arquivos do app para funcionar offline.
 // Ao mudar qualquer arquivo listado abaixo, aumente a versão para os usuários receberem a atualização.
-const CACHE = "leituragil-v2";
+const CACHE = "leituragil-v3";
 const ASSETS = [
   "./",
   "./index.html",
