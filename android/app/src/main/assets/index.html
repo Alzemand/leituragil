@@ -183,9 +183,9 @@
   .rsvp .notch-t, .rsvp .notch-b { position: absolute; left: 50%; width: 2px; height: .28em; background: var(--muted); transform: translateX(-1px); }
   .rsvp .notch-t { top: 0; }
   .rsvp .notch-b { bottom: 0; }
-  .rsvp .pre { text-align: right; overflow: hidden; }
+  .rsvp .pre { text-align: right; }
   .rsvp .piv { color: var(--pivot); }
-  .rsvp .post { text-align: left; overflow: hidden; }
+  .rsvp .post { text-align: left; }
 
   /* ---------- Leitor (tela cheia) ---------- */
   .reader {
@@ -193,10 +193,11 @@
     padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
   .reader.open { display: flex; }
-  .reader-top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+  .reader-top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
   .reader-top .group { display: flex; gap: .4rem; }
-  .stage { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; cursor: pointer; user-select: none; -webkit-user-select: none; }
-  .stage .rsvp { font-size: calc(clamp(2.5rem, 11vw, 6rem) * var(--reader-scale) * var(--len-scale, 1)); }
+  .stage { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; overflow: hidden; cursor: pointer; user-select: none; -webkit-user-select: none; }
+  /* Tamanho base pelo menor lado da tela; --fit (JS) reduz palavras que não caberiam. */
+  .stage .rsvp { font-size: calc(clamp(2rem, min(11vw, 17vh), 6rem) * var(--reader-scale) * var(--fit, 1)); }
   .stage-hint { text-align: center; color: var(--muted); font-size: .95rem; min-height: 1.5em; margin-top: 1.5rem; }
   .context { max-width: 36rem; margin: 1.5rem auto 0; padding: 0 .5rem; font-family: var(--read); font-size: 1.05rem; line-height: 1.7; color: var(--muted); text-align: center; visibility: hidden; }
   .reader.paused .context { visibility: visible; }
@@ -205,6 +206,7 @@
   .bar { position: relative; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; cursor: pointer; }
   .bar span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ink); border-radius: inherit; }
   .progress-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: .88rem; margin-top: .4rem; font-variant-numeric: tabular-nums; }
+  .reader-bottom { display: flex; flex-direction: column; align-items: center; }
   .controls { display: flex; justify-content: center; align-items: center; gap: .5rem; margin: 1rem 0 .75rem; }
   .ctrl { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--line); background: transparent; display: grid; place-items: center; }
   .ctrl:hover { background: var(--surface); }
@@ -226,11 +228,12 @@
   /* ---------- Aviso rápido ---------- */
   .toast {
     position: fixed; left: 50%; top: max(16px, env(safe-area-inset-top)); z-index: 80;
-    transform: translate(-50%, -160%); transition: transform .25s ease;
+    transform: translate(-50%, -120%); opacity: 0; visibility: hidden; pointer-events: none;
+    transition: transform .25s ease, opacity .25s ease, visibility 0s linear .25s;
     background: var(--ink); color: var(--paper); padding: .65rem 1.1rem; border-radius: 999px; font-size: .95rem;
     max-width: calc(100% - 32px); text-align: center;
   }
-  .toast.show { transform: translate(-50%, 0); }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; transition: transform .25s ease, opacity .25s ease; }
 
   @media (max-width: 420px) {
     .ctrl { width: 46px; height: 46px; }
@@ -238,8 +241,19 @@
     .controls { gap: .35rem; }
   }
   @media (max-height: 520px) and (orientation: landscape) {
-    .stage-hint, .context { display: none; }
-    .controls { margin: .5rem 0; }
+    .reader { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+    .reader-top .icon-btn { min-height: 40px; min-width: 40px; }
+    .stage-hint, .context, .keys { display: none !important; }
+    .stage .rsvp { font-size: calc(clamp(1.75rem, 19vh, 5rem) * var(--reader-scale) * var(--fit, 1)); }
+    .progress { max-width: none; }
+    .progress-meta { margin-top: .2rem; }
+    .reader-bottom { flex-direction: row; justify-content: center; gap: 1.5rem; margin-top: .4rem; }
+    .controls { margin: 0; gap: .4rem; }
+    .ctrl { width: 44px; height: 44px; }
+    .ctrl.play { width: 56px; height: 56px; }
+    .ctrl.play svg { width: 1.5rem; height: 1.5rem; }
+    .speed-ctl { gap: .4rem; }
+    .speed-ctl output { min-width: 5.5rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -375,6 +389,7 @@
     <div class="progress-meta"><span id="posLabel"></span><span id="remainLabel"></span></div>
   </div>
 
+  <div class="reader-bottom">
   <div class="controls">
     <button class="ctrl" type="button" id="backSentence" aria-label="Frase anterior"><svg class="i"><use href="#i-back-s"/></svg></button>
     <button class="ctrl" type="button" id="backWord" aria-label="Palavra anterior"><svg class="i"><use href="#i-prev"/></svg></button>
@@ -387,6 +402,7 @@
     <button class="icon-btn outlined" type="button" id="slower" aria-label="Mais devagar"><svg class="i"><use href="#i-minus"/></svg></button>
     <output id="readerSpeed" aria-live="polite"><b>300</b> ppm</output>
     <button class="icon-btn outlined" type="button" id="faster" aria-label="Mais rápido"><svg class="i"><use href="#i-plus"/></svg></button>
+  </div>
   </div>
   <p class="keys"><kbd>Espaço</kbd> pausar &nbsp; <kbd>←</kbd><kbd>→</kbd> palavra &nbsp; <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> frase &nbsp; <kbd>↑</kbd><kbd>↓</kbd> velocidade &nbsp; <kbd>Esc</kbd> sair</p>
 </div>
@@ -473,7 +489,21 @@
     pre.textContent = word.slice(0, i);
     piv.textContent = word.charAt(i);
     post.textContent = word.slice(i + 1);
-    container.style.setProperty("--len-scale", Math.min(1, 13 / Math.max(13, word.length)).toFixed(3));
+    fitWord(container);
+  }
+
+  // Reduz a fonte só o necessário para a palavra caber inteira, com a letra de foco fixa no centro.
+  var range = document.createRange();
+  function textWidth(el) { range.selectNodeContents(el); return range.getBoundingClientRect().width; }
+  function fitWord(container) {
+    if (!container.offsetParent) return;           // invisível: nada a medir
+    container.style.setProperty("--fit", "1");
+    var pivW = textWidth(container.querySelector(".piv"));
+    var left = textWidth(container.querySelector(".pre")) + pivW / 2;
+    var right = textWidth(container.querySelector(".post")) + pivW / 2;
+    var half = container.clientWidth / 2 - 4;
+    var need = Math.max(left, right);
+    if (need > half && need > 0) container.style.setProperty("--fit", (half / need).toFixed(3));
   }
 
   function delayFor(w) {
@@ -736,7 +766,13 @@
     state.scale = clamp(Math.round(v * 10) / 10, 0.6, 1.6);
     document.documentElement.style.setProperty("--reader-scale", state.scale);
     store.set("scale", state.scale);
+    fitWord(els.word);
   }
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { fitWord(els.word); }, 100);
+  });
 
   function keepAwake(on) {
     try {
