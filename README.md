@@ -18,6 +18,9 @@ Transforme a maneira como você lê! O Leiturágil é um aplicativo inovador que
 - **Tema claro, escuro ou automático** e tamanho da palavra ajustável.
 - **Atalhos de teclado** no computador: Espaço, ←/→ (palavra), Shift+←/→ (frase), ↑/↓ (velocidade), Esc.
 - **Funciona offline**: fontes e ícones incluídos no projeto, sem dependências externas.
+- **Instalável (PWA)**: no Chrome/Edge/Android, abra Ajustes e toque em Instalar; no iPhone, use Compartilhar → Adicionar à Tela de Início. Depois de instalado, abre direto da tela inicial e funciona sem internet.
+
+> Ao alterar `index.html` ou outros arquivos do app, aumente a versão de `CACHE` em `sw.js` para os usuários receberem a atualização. A instalação exige HTTPS.
 
 ![Leiturágil Screenshot](/img/2.jpeg)
 
