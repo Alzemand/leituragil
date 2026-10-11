@@ -8,11 +8,16 @@ Transforme a maneira como você lê! O Leiturágil é um aplicativo inovador que
 
 ## Principais Recursos
 
-- **Leitura em Tela Cheia**: Desfrute de uma experiência de leitura sem distrações com nossa interface em tela cheia que foca apenas no texto.
-- **Ajuste de Velocidade**: Escolha sua velocidade de leitura ideal (300, 400 ou 500 palavras por minuto) e siga o ritmo que melhor se adapta a você.
-- **Interação com o Texto**: Clique em palavras específicas para destacá-las e revisitar passagens importantes com facilidade.
-- **Modo Escuro**: Ative o modo escuro para uma leitura mais confortável em ambientes com pouca luz, reduzindo o cansaço ocular.
-- **Design Responsivo**: O aplicativo se adapta a diferentes tamanhos de tela, garantindo uma leitura agradável em qualquer dispositivo.
+- **Uma palavra por vez, no mesmo ponto**: cada palavra aparece centralizada numa janela de leitura, com a letra de foco destacada em cor para os olhos não precisarem se mover.
+- **Velocidade ajustável**: de 100 a 1.000 palavras por minuto, com atalhos sugeridos (250, 350, 500 e 700) e ajuste fino durante a leitura.
+- **Pausa nas pontuações**: respiros curtos em vírgulas, finais de frase, parágrafos e palavras longas deixam a leitura mais natural (pode ser desligado).
+- **Controles simples**: toque na palavra para pausar; volte ou avance por palavra ou por frase; arraste pela barra de progresso.
+- **Contexto ao pausar**: ao pausar, a frase atual aparece com a palavra marcada, para você não perder o fio.
+- **Comece de onde quiser**: toque em qualquer palavra do texto para iniciar a partir dela. O app lembra onde você parou.
+- **Entrada fácil**: cole o texto, abra um arquivo .txt ou experimente com o texto de exemplo. Mostra a quantidade de palavras e o tempo estimado.
+- **Tema claro, escuro ou automático** e tamanho da palavra ajustável.
+- **Atalhos de teclado** no computador: Espaço, ←/→ (palavra), Shift+←/→ (frase), ↑/↓ (velocidade), Esc.
+- **Funciona offline**: fontes e ícones incluídos no projeto, sem dependências externas.
 
 ![Leiturágil Screenshot](/img/2.jpeg)
 
